@@ -1,5 +1,9 @@
 package com.a6tak.practice.ui
 
+import android.Manifest
+import android.app.PendingIntent
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -34,16 +38,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.toRoute
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import com.a6tak.practice.CHANNEL_ID
+//import com.a6tak.practice.Manifest
 import com.a6tak.practice.PracticeApp
 import com.a6tak.practice.R
 import com.a6tak.practice.databinding.ProfileFragmentBinding
+import com.a6tak.practice.utils.PracticeWorker
+import com.a6tak.practice.utils.notificationBuilder
+import com.a6tak.practice.utils.showNotification
 import kotlinx.coroutines.launch
 import kotlin.random.Random
+
 
 class ProfileFragment : Fragment(R.layout.profile_fragment) {
     private var _binding: ProfileFragmentBinding? = null
@@ -104,6 +123,27 @@ class ProfileFragment : Fragment(R.layout.profile_fragment) {
                             randomColor = generateRandomColor()
                         }) {
                             Text(text = "Play color")
+                        }
+
+                        TextButton(onClick = {
+                            showNotification(builder =notificationBuilder(requireContext(), "title", "description"), requireContext() )
+                        }) {
+                            Text("SHOW ME YOUR NOTIFICATION")
+                        }
+
+                        TextButton(onClick = {
+                            val constraints = Constraints.Builder()
+                                .setRequiredNetworkType(NetworkType.CONNECTED)
+                                .build()
+
+                            val testWorkRequest: WorkRequest =
+                                OneTimeWorkRequestBuilder<PracticeWorker>()
+//                                    .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                                    .setConstraints(constraints)
+                                    .build()
+                            WorkManager.getInstance(requireContext()).enqueue(testWorkRequest)
+                        }) {
+                            Text(text = "SCHEDULE TASK")
                         }
 
                         when (val currentState = state) {

@@ -72,6 +72,8 @@ dependencies {
     // Optional - Integration with ViewModels
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
+    implementation(libs.androidx.work.runtime.ktx)
+
 
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.navigation.ui.ktx)
